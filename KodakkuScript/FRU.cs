@@ -17,7 +17,7 @@ using Dalamud.Utility.Numerics;
 namespace KodakkuScript;
 
 
-[ScriptType(name: "絶もうひとつの未来", territorys: [1238], guid: "9AA9B4F9-4B1E-48BB-8FFF-F2CD7C1FEE33", version: "0.0.0.2", note: noteStr)]
+[ScriptType(name: "絶もうひとつの未来", territorys: [1238], guid: "9AA9B4F9-4B1E-48BB-8FFF-F2CD7C1FEE33", version: "0.0.0.3", note: noteStr)]
 public class EdenUltimate
 {
 	const string noteStr =
@@ -2062,7 +2062,7 @@ public class EdenUltimate
 
 
 	}
-	[ScriptMethod(name: "P3_时间压缩_头标", eventType: EventTypeEnum.StatusAdd, eventCondition: ["StatusID:regex:^(2455|2456|2464|2462|2461|2460)$"], userControl: false)]
+	[ScriptMethod(name: "P3_时间压缩_头标", eventType: EventTypeEnum.StatusAdd, eventCondition: ["StatusID:regex:^(2455|2456|2464|2462|2461|2460)$"], userControl: true)]
 	public void P3_时间压缩_头标(Event @event, ScriptAccessory accessory)
 	{
 		var myPartyIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
@@ -3546,7 +3546,7 @@ public class EdenUltimate
 			P4OtherBuff[index] = 5;
 		}
 	}
-	[ScriptMethod(name: "P4_时间结晶_头标", eventType: EventTypeEnum.StatusAdd, eventCondition: ["StatusID:regex:^(326[34]|2454|246[0123])$"], userControl: false)]
+	[ScriptMethod(name: "P4_时间结晶_头标", eventType: EventTypeEnum.StatusAdd, eventCondition: ["StatusID:regex:^(326[34]|2454|246[0123])$"], userControl: true)]
 	public void P4_时间结晶_头标(Event @event, ScriptAccessory accessory)
 	{
 		if (parse != 4.3) return;
