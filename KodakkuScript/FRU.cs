@@ -17,7 +17,7 @@ using Dalamud.Utility.Numerics;
 namespace KodakkuScript;
 
 
-[ScriptType(name: "絶もうひとつの未来", territorys: [1238], guid: "9AA9B4F9-4B1E-48BB-8FFF-F2CD7C1FEE33", version: "0.0.0.3", note: noteStr)]
+[ScriptType(name: "絶もうひとつの未来", territorys: [1238], guid: "9AA9B4F9-4B1E-48BB-8FFF-F2CD7C1FEE33", version: "0.0.0.4", note: noteStr)]
 public class EdenUltimate
 {
 	const string noteStr =
@@ -201,7 +201,7 @@ public class EdenUltimate
 		}
 		else
 		{
-			int[] group = [6, 7, 4, 5, 2, 3, 0, 1];
+			int[] group = [6, 5, 4, 7, 2, 3, 0, 1];
 			var myindex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
 			for (int i = 0; i < 4; i++)
 			{
