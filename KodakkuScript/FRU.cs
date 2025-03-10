@@ -2065,6 +2065,7 @@ public class EdenUltimate
 	[ScriptMethod(name: "P3_时间压缩_头标", eventType: EventTypeEnum.StatusAdd, eventCondition: ["StatusID:regex:^(2455|2456|2464|2462|2461|2460)$"], userControl: true)]
 	public void P3_时间压缩_头标(Event @event, ScriptAccessory accessory)
 	{
+		if (parse != 3.1) return;
 		var myPartyIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
 		//短火
 		if (P3FireBuff[myPartyIndex] == 1)
