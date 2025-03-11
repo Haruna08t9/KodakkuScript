@@ -17,7 +17,7 @@ using Dalamud.Utility.Numerics;
 namespace KodakkuScript;
 
 
-[ScriptType(name: "絶もうひとつの未来", territorys: [1238], guid: "9AA9B4F9-4B1E-48BB-8FFF-F2CD7C1FEE33", version: "0.0.0.4", note: noteStr)]
+[ScriptType(name: "絶もうひとつの未来", territorys: [1238], guid: "9AA9B4F9-4B1E-48BB-8FFF-F2CD7C1FEE33", version: "0.0.0.5", note: noteStr)]
 public class EdenUltimate
 {
 	const string noteStr =
