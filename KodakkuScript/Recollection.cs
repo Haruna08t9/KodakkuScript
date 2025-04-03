@@ -513,8 +513,8 @@ namespace KodakkuScript
 			P2Tether[tIndex] = 1;
 		}
 
-		[ScriptMethod(name: "圣护壁_线指路", eventType: EventTypeEnum.Tether, eventCondition: ["Id:0011"])]
-		/*public void 圣护壁_线指路(Event @event, ScriptAccessory accessory)
+		/*[ScriptMethod(name: "圣护壁_线指路", eventType: EventTypeEnum.Tether, eventCondition: ["Id:0011"])]
+		public void 圣护壁_线指路(Event @event, ScriptAccessory accessory)
 		{
 			if (parse != 2.0) return;
 			if (!ParseObjectId(@event["SourceId"], out var sid)) return;
