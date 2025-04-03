@@ -17,28 +17,25 @@ using Dalamud.Utility.Numerics;
 namespace KodakkuScript;
 
 
-[ScriptType(name: "絶もうひとつの未来", territorys: [1238], guid: "9AA9B4F9-4B1E-48BB-8FFF-F2CD7C1FEE33", version: "0.0.0.5", note: noteStr)]
+[ScriptType(name: "絶もうひとつの未来", territorys: [1238], guid: "9AA9B4F9-4B1E-48BB-8FFF-F2CD7C1FEE33", version: "0.0.0.6", note: noteStr, author: "Karlin")]
 public class EdenUltimate
 {
 	const string noteStr =
 	"""
-        基于K佬脚本修改
+        基于Karlin原版+灵视改版脚本修改
         适应绝伊甸日野打法
+        by UMP
         P1-P3 新リリド
         P4 ぬけまる1:7赤爆走アムレンY字
         P5 ぬけまる
         """;
 
-	[UserSetting("P3_分灯方式")]
-	public P3LampEmum P3LampDeal { get; set; }
-	[UserSetting("P3_T跳远引导位置")]
+	[UserSetting("P3_显示T跳远引导位置")]
 	public bool P3JumpPosition { get; set; } = false;
 	[UserSetting("P4_一运换位时机")]
 	public P4triggertime P4triggertimes { get; set; }
 	[UserSetting("P4_二运常/慢灯AOE显示时间(ms)")]
 	public uint P4LampDisplayDur { get; set; } = 3000;
-	[UserSetting("P4_白圈提示线颜色")]
-	public ScriptColor P4WhiteCircleLineColor { get; set; } = new();
 
 	[UserSetting("P5_地火颜色")]
 	public ScriptColor P5PathColor { get; set; } = new() { V4 = new(0, 1, 1, 1) };
@@ -86,17 +83,11 @@ public class EdenUltimate
 	bool P5MtDone = false;
 	string P5Tower = "";
 
-
-	public enum P3LampEmum
-	{
-		MGL
-	}
 	public enum P4triggertime
 	{
 		扇前,
 		扇后
 	}
-
 
 	public void Init(ScriptAccessory accessory)
 	{
@@ -493,15 +484,32 @@ public class EdenUltimate
 		if (parse != 1d) return;
 		if (!ParseObjectId(@event["SourceId"], out var sid)) return;
 
-		var delay = 4000;
-
-		var dp = accessory.Data.GetDefaultDrawProperties();
+		/*var dp = accessory.Data.GetDefaultDrawProperties();
 		dp.Name = "P1_转轮召_雷直线";
 		dp.Scale = new(20, 40);
 		dp.Owner = sid;
 		dp.Color = accessory.Data.DefaultDangerColor;
 		dp.Delay = delay;
 		dp.DestoryAt = 9700 - delay;
+		accessory.Method.SendDraw(DrawModeEnum.Default, DrawTypeEnum.Rect, dp);*/
+
+
+		var dp = accessory.Data.GetDefaultDrawProperties();
+		dp.Name = "Phase1_Second_Strike_Of_Thunder_Burnt_Strike_雷燃烧击第二击";
+		dp.Scale = new(20, 40);
+		dp.Owner = sid;
+		dp.Color = accessory.Data.DefaultDangerColor.WithW(1f);
+		dp.Delay = 4000;
+		dp.DestoryAt = 5750;
+		accessory.Method.SendDraw(DrawModeEnum.Default, DrawTypeEnum.Rect, dp);
+
+		dp = accessory.Data.GetDefaultDrawProperties();
+		dp.Name = "Phase1_First_Strike_Of_Thunder_Burnt_Strike_雷燃烧击第一击";
+		dp	.Scale = new(10, 40);
+		dp.Owner = sid;
+		dp.Color = accessory.Data.DefaultDangerColor.WithW(3f);
+		dp.Delay = 4000;
+		dp.DestoryAt = 3750;
 		accessory.Method.SendDraw(DrawModeEnum.Default, DrawTypeEnum.Rect, dp);
 
 	}
@@ -511,7 +519,7 @@ public class EdenUltimate
 		if (parse != 1d) return;
 		if (!ParseObjectId(@event["SourceId"], out var sid)) return;
 
-		var delay = 4000;
+		/*var delay = 4000;
 
 		var dp = accessory.Data.GetDefaultDrawProperties();
 		dp.Name = "P1_转轮召_火直线";
@@ -520,7 +528,60 @@ public class EdenUltimate
 		dp.Color = accessory.Data.DefaultDangerColor;
 		dp.Delay = delay;
 		dp.DestoryAt = 7700 - delay;
-		accessory.Method.SendDraw(DrawModeEnum.Default, DrawTypeEnum.Rect, dp);
+		accessory.Method.SendDraw(DrawModeEnum.Default, DrawTypeEnum.Rect, dp);*/
+
+		var currentProperty = accessory.Data.GetDefaultDrawProperties();
+
+		currentProperty.Name = "Phase1_First_Strike_Of_Fire_Burnt_Strike_火燃烧击第一击";
+		currentProperty.Scale = new(10, 40);
+		currentProperty.Owner = sid;
+		currentProperty.Color = accessory.Data.DefaultDangerColor.WithW(3f);
+		currentProperty.Delay = 4000;
+		currentProperty.DestoryAt = 3750;
+
+		accessory.Method.SendDraw(DrawModeEnum.Default, DrawTypeEnum.Rect, currentProperty);
+
+		currentProperty = accessory.Data.GetDefaultDrawProperties();
+
+		currentProperty.Name = "Phase1_Central_Axis_Of_Fire_Burnt_Strike_火燃烧击中轴线";
+		currentProperty.Scale = new(0.5f, 40f);
+		currentProperty.Owner = sid;
+		currentProperty.Color = accessory.Data.DefaultDangerColor.WithW(25f);
+		currentProperty.Delay = 4000;
+		currentProperty.DestoryAt = 5750;
+
+		accessory.Method.SendDraw(DrawModeEnum.Default, DrawTypeEnum.Rect, currentProperty);
+
+		for (int i = 6; i <= 34; i += 7)
+		{
+
+			currentProperty = accessory.Data.GetDefaultDrawProperties();
+
+			currentProperty.Name = "Phase1_Knockback_Direction_Of_Fire_Burnt_Strike_火燃烧击击退方向";
+			currentProperty.Scale = new(1f, 1.618f);
+			currentProperty.Owner = sid;
+			currentProperty.Color = accessory.Data.DefaultDangerColor.WithW(1f);
+			currentProperty.Offset = new Vector3(-5.382f, 0, -i);
+			currentProperty.Rotation = float.Pi / 2;
+			currentProperty.Delay = 4000;
+			currentProperty.DestoryAt = 5750;
+
+			accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Arrow, currentProperty);
+
+			currentProperty = accessory.Data.GetDefaultDrawProperties();
+
+			currentProperty.Name = "Phase1_Knockback_Direction_Of_Fire_Burnt_Strike_火燃烧击击退方向";
+			currentProperty.Scale = new(1f, 1.618f);
+			currentProperty.Owner = sid;
+			currentProperty.Color = accessory.Data.DefaultDangerColor.WithW(1f);
+			currentProperty.Offset = new Vector3(5.382f, 0, -i);
+			currentProperty.Rotation = -(float.Pi / 2);
+			currentProperty.Delay = 4000;
+			currentProperty.DestoryAt = 5750;
+
+			accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Arrow, currentProperty);
+
+		}
 
 	}
 	[ScriptMethod(name: "P1_转轮召_抓人记录", eventType: EventTypeEnum.StatusAdd, eventCondition: ["StatusID:4165"], userControl: false)]
@@ -862,7 +923,7 @@ public class EdenUltimate
 		if (@event["ActionId"] == "40134")
 		{
 			//雷
-			var dp = accessory.Data.GetDefaultDrawProperties();
+			/*var dp = accessory.Data.GetDefaultDrawProperties();
 			dp.Name = "P1_塔_雷直线";
 			dp.Scale = new(20, 40);
 			dp.Owner = sid;
@@ -876,18 +937,88 @@ public class EdenUltimate
 			dp.Owner = sid;
 			dp.Color = accessory.Data.DefaultDangerColor;
 			dp.DestoryAt = 6500;
-			accessory.Method.SendDraw(DrawModeEnum.Default, DrawTypeEnum.Straight, dp);
+			accessory.Method.SendDraw(DrawModeEnum.Default, DrawTypeEnum.Straight, dp);*/
+
+			var currentProperty = accessory.Data.GetDefaultDrawProperties();
+
+			currentProperty.Name = "Phase1_Second_Strike_Of_Thunder_Burnt_Strike_雷燃烧击第二击";
+			currentProperty.Scale = new(20, 40);
+			currentProperty.Owner = sid;
+			currentProperty.Color = accessory.Data.DefaultDangerColor.WithW(1f);
+			currentProperty.DestoryAt = 8200;
+
+			accessory.Method.SendDraw(DrawModeEnum.Default, DrawTypeEnum.Straight, currentProperty);
+
+			currentProperty = accessory.Data.GetDefaultDrawProperties();
+
+			currentProperty.Name = "Phase1_First_Strike_Of_Thunder_Burnt_Strike_雷燃烧击第一击";
+			currentProperty.Scale = new(10, 40);
+			currentProperty.Owner = sid;
+			currentProperty.Color = accessory.Data.DefaultDangerColor.WithW(3f);
+			currentProperty.DestoryAt = 6500;
+
+			accessory.Method.SendDraw(DrawModeEnum.Default, DrawTypeEnum.Straight, currentProperty);
 
 		}
 		else
 		{
-			var dp = accessory.Data.GetDefaultDrawProperties();
+			/*var dp = accessory.Data.GetDefaultDrawProperties();
 			dp.Name = "P1_塔_火直线";
 			dp.Scale = new(10, 40);
 			dp.Owner = sid;
 			dp.Color = accessory.Data.DefaultDangerColor;
 			dp.DestoryAt = 6500;
-			accessory.Method.SendDraw(DrawModeEnum.Default, DrawTypeEnum.Straight, dp);
+			accessory.Method.SendDraw(DrawModeEnum.Default, DrawTypeEnum.Straight, dp);*/
+
+			var currentProperty = accessory.Data.GetDefaultDrawProperties();
+
+			currentProperty.Name = "Phase1_First_Strike_Of_Fire_Burnt_Strike_火燃烧击第一击";
+			currentProperty.Scale = new(10, 40);
+			currentProperty.Owner = sid;
+			currentProperty.Color = accessory.Data.DefaultDangerColor.WithW(3f);
+			currentProperty.DestoryAt = 6500;
+
+			accessory.Method.SendDraw(DrawModeEnum.Default, DrawTypeEnum.Straight, currentProperty);
+
+			currentProperty = accessory.Data.GetDefaultDrawProperties();
+
+			currentProperty.Name = "Phase1_Central_Axis_Of_Fire_Burnt_Strike_火燃烧击中轴线";
+			currentProperty.Scale = new(0.5f, 40f);
+			currentProperty.Owner = sid;
+			currentProperty.Color = accessory.Data.DefaultDangerColor.WithW(25f);
+			currentProperty.DestoryAt = 8200;
+
+			accessory.Method.SendDraw(DrawModeEnum.Default, DrawTypeEnum.Straight, currentProperty);
+
+			for (int i = -4; i <= 4; ++i)
+			{
+
+				currentProperty = accessory.Data.GetDefaultDrawProperties();
+
+				currentProperty.Name = "Phase1_Knockback_Direction_Of_Fire_Burnt_Strike_火燃烧击击退方向";
+				currentProperty.Scale = new(1f, 1.618f);
+				currentProperty.Owner = sid;
+				currentProperty.Color = accessory.Data.DefaultDangerColor.WithW(1f);
+				currentProperty.Offset = new Vector3(-5.382f, 0, (float)(-(i * 4.595d)));
+				currentProperty.Rotation = float.Pi / 2;
+				currentProperty.DestoryAt = 8200;
+
+				accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Arrow, currentProperty);
+
+				currentProperty = accessory.Data.GetDefaultDrawProperties();
+
+				currentProperty.Name = "Phase1_Knockback_Direction_Of_Fire_Burnt_Strike_火燃烧击击退方向";
+				currentProperty.Scale = new(1f, 1.618f);
+				currentProperty.Owner = sid;
+				currentProperty.Color = accessory.Data.DefaultDangerColor.WithW(1f);
+				currentProperty.Offset = new Vector3(5.382f, 0, (float)(-(i * 4.595d)));
+				currentProperty.Rotation = -(float.Pi / 2);
+				currentProperty.DestoryAt = 8200;
+
+				accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Arrow, currentProperty);
+
+			}
+
 		}
 
 
@@ -942,9 +1073,9 @@ public class EdenUltimate
 						}
 						else if (P1塔[2] == 3 || P1塔[2] == 4)
 						{
-							dealpos = new(eastTower ? 115.98f : 84.02f, 0, 109.18f);
+							dealpos = new(eastTower ? 113.08f : 86.92f, 0, 109.18f);
 						}
-						else dealpos = new(eastTower ? 113.08f : 86.92f, 0, 100f);
+						else dealpos = new(eastTower ? 115.98f : 84.02f, 0, 100f);
 					}
 					if (myindex == 6)
 					{
@@ -984,9 +1115,9 @@ public class EdenUltimate
 						}
 						else if (P1塔[2] == 3 || P1塔[2] == 4)
 						{
-							towerpos = new(eastTower ? 115.98f : 84.02f, 0, 109.18f);
+							towerpos = new(eastTower ? 113.08f : 86.92f, 0, 109.18f);
 						}
-						else towerpos = new(eastTower ? 113.08f : 86.92f, 0, 100f);
+						else towerpos = new(eastTower ? 115.98f : 84.02f, 0, 100f);
 					}
 					if (myindex == 6)
 					{
@@ -1130,9 +1261,9 @@ public class EdenUltimate
 						}
 						else if (P1塔[2] == 3 || P1塔[2] == 4)
 						{
-							towerpos = new(eastTower ? 115.98f : 84.02f, 0, 109.18f);
+							towerpos = new(eastTower ? 113.08f : 86.92f, 0, 109.18f);
 						}
-						else towerpos = new(eastTower ? 113.08f : 86.92f, 0, 100f);
+						else towerpos = new(eastTower ? 115.98f : 84.02f, 0, 100f);
 					}
 					if (myindex == 6)
 					{
@@ -2753,64 +2884,60 @@ public class EdenUltimate
 				break;
 			}
 		}
-		if (P3LampDeal == P3LampEmum.MGL)
+		//短火
+		if (P3FireBuff[myPartyIndex] == 1)
 		{
-			//短火
-			if (P3FireBuff[myPartyIndex] == 1)
+			if (myPartyIndex < 4)
 			{
-				if (myPartyIndex < 4)
+				return (nLampIndex + 4) % 8;
+			}
+			else
+			{
+				var lowIndex = P3FireBuff.LastIndexOf(1);
+				if (lowIndex != myPartyIndex)
 				{
-					return (nLampIndex + 4) % 8;
+					return (nLampIndex + 7) % 8;
 				}
 				else
 				{
-					var lowIndex = P3FireBuff.LastIndexOf(1);
-					if (lowIndex != myPartyIndex)
-					{
-						return (nLampIndex + 7) % 8;
-					}
-					else
-					{
-						return (nLampIndex + 1) % 8;
-					}
+					return (nLampIndex + 1) % 8;
 				}
+			}
 
-			}
-			//中火
-			if (P3FireBuff[myPartyIndex] == 2)
-			{
-				if (myPartyIndex < 4) return (nLampIndex + 6) % 8;
-				else return (nLampIndex + 2) % 8;
-			}
-			//长火
-			if (P3FireBuff[myPartyIndex] == 3)
-			{
-				if (myPartyIndex < 4)
-				{
-					var highIndex = P3FireBuff.IndexOf(3);
-					if (highIndex == myPartyIndex)
-					{
-						return (nLampIndex + 5) % 8;
-					}
-					else
-					{
-						return (nLampIndex + 3) % 8;
-					}
-				}
-				else
-				{
-					return (nLampIndex + 0) % 8;
-				}
-
-			}
-			//冰
-			if (P3FireBuff[myPartyIndex] == 4)
-			{
-				if (myPartyIndex < 4) return (nLampIndex + 4) % 8;
-				else return (nLampIndex + 0) % 8;
-			}
 		}
+		//中火
+		if (P3FireBuff[myPartyIndex] == 2)
+		{
+			if (myPartyIndex < 4) return (nLampIndex + 6) % 8;
+			else return (nLampIndex + 2) % 8;
+		}
+		//长火
+		if (P3FireBuff[myPartyIndex] == 3)
+		{
+			if (myPartyIndex < 4)
+			{
+				var highIndex = P3FireBuff.IndexOf(3);
+				if (highIndex == myPartyIndex)
+				{
+					return (nLampIndex + 5) % 8;
+				}
+				else
+				{
+					return (nLampIndex + 3) % 8;
+				}
+			}
+			else
+			{
+				return (nLampIndex + 0) % 8;
+			}
 
+		}
+		//冰
+		if (P3FireBuff[myPartyIndex] == 4)
+		{
+			if (myPartyIndex < 4) return (nLampIndex + 4) % 8;
+			else return (nLampIndex + 0) % 8;
+		}
 		return -1;
 	}
 	#endregion
