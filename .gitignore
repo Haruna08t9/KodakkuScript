@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /KodakkuScript.sln
 /.editorconfig
 /KodakkuScript/KodakkuScript.csproj
+/.gitmodules
