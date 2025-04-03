@@ -30,7 +30,7 @@ namespace KodakkuScript
 	{
 		const string noteStr =
 	"""
-        Game8打法，开箱即用
+        简易版，指路等攻略稳定再添加
 
         """;
 		[UserSetting("启用Debug输出")]
