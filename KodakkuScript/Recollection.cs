@@ -20,6 +20,7 @@ using Microsoft.VisualBasic.Logging;
 using System.Reflection;
 using KodakkuAssist.Data;
 using KodakkuAssist.Extensions;
+using ECommons.DalamudServices;
 
 
 namespace KodakkuScript
@@ -38,7 +39,7 @@ namespace KodakkuScript
 
 		string debugOutput = "";
 
-		double parse = 0;
+		int parse = -1;
 
 		List<int> P1Tower = [0, 0, 0, 0, 0, 0, 0, 0];
 		List<int> P2Tether = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -93,7 +94,7 @@ namespace KodakkuScript
 		{	
 			accessory.Method.RemoveDraw(".*");
 			debugOutput = "";
-			parse = 1.0;
+			parse = 1;
 			P1Tower = [0, 0, 0, 0, 0, 0, 0, 0];
 			P2Tether = [0, 0, 0, 0, 0, 0, 0, 0];
 			P3_3Mark = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -115,7 +116,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "开场_月环踩塔_点名记录", eventType: EventTypeEnum.TargetIcon, eventCondition: ["Id:0244"], userControl: false)]
 		public void 开场_月环踩塔_点名记录(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 1.0) return;
+			if (parse != 1) return;
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
 			var tIndex = accessory.Data.PartyList.IndexOf(((uint)tid));
 			P1Tower[tIndex] = 1;
@@ -124,7 +125,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "开场_月环踩塔_指路", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43226"])]
 		public void 开场_月环踩塔_指路(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 1.0) return;
+			if (parse != 1) return;
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
 			if (P1Tower[myIndex] != 1) return;
 
@@ -186,7 +187,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "第一轮远近刀_远近记录", eventType: EventTypeEnum.StatusAdd, eventCondition: ["StatusID:2970"], userControl: false)]
 		public void 第一轮远近刀_远近记录(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 1.0) return;
+			if (parse != 1) return;
 			远近刀记录.Add(@event.StatusParam == 759);
 			if (EnableDev)
 			{
@@ -198,7 +199,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "第一轮远近刀_指路", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43181"])]
 		public async void 第一轮远近刀_指路(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 1.0) return;
+			if (parse != 1) return;
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
 			//13-3-3-3
 			//从正西开始顺时针1-8
@@ -501,22 +502,22 @@ namespace KodakkuScript
 		[ScriptMethod(name: "圣护壁阶段_换P", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43189"], userControl: false)]
 		public void 圣护壁阶段_换P(Event @event, ScriptAccessory accessory)
 		{
-			parse = 2.0;
+			parse = 2;
 			远近刀记录 = [];
 		}
 
 		[ScriptMethod(name: "圣护壁_线收集", eventType: EventTypeEnum.Tether, eventCondition: ["Id:0011"], userControl: false)]
 		public void 圣护壁_线收集(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 2.0) return;
+			if (parse != 2) return;
 			var tIndex = accessory.Data.PartyList.IndexOf((uint)@event.TargetId);
 			P2Tether[tIndex] = 1;
 		}
 
-		/*[ScriptMethod(name: "圣护壁_线指路", eventType: EventTypeEnum.Tether, eventCondition: ["Id:0011"])]
+		[ScriptMethod(name: "圣护壁_线指路", eventType: EventTypeEnum.Tether, eventCondition: ["Id:0011"])]
 		public void 圣护壁_线指路(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 2.0) return;
+			if (parse != 2) return;
 			if (!ParseObjectId(@event["SourceId"], out var sid)) return;
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
 			if (P2Tether[myIndex] != 1) return;
@@ -530,16 +531,14 @@ namespace KodakkuScript
 			var pos = JsonConvert.DeserializeObject<Vector3>(@event["SourcePosition"]);
 			var c = accessory.Data.Objects.SearchById(sid);
 			if (c == null) return;
-			uint transformationID = ExceptionObject.GetTransformationID((KodakkuAssist.Data.IBattleChara)c);
+			var transformationID = ((KodakkuAssist.Data.IBattleChara)c).GetTransformationID();
+
 			if (EnableDev)
 			{
 				debugOutput = c.Position.ToString();
-				accessory.Method.SendChat($"""/e {debugOutput}""");
-			}
-			if (EnableDev)
-			{
+				accessory.Method.SendChat($"""/e {debugOutput}""");			
 				debugOutput = transformationID.ToString();
-				accessory.Method.SendChat($"""/e {debugOutput}""");
+				accessory.Method.SendChat($"""/e {debugOutput}"""); 
 			}
 			Vector3 TH_N_Pos = new(pos.X, 0, pos.Z - 3);
 			Vector3 TH_S_Pos = new(pos.X, 0, pos.Z + 3);
@@ -574,19 +573,19 @@ namespace KodakkuScript
 				dp.DestoryAt = 5000;
 				accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
 			}
-		}*/
+		}
 
 		[ScriptMethod(name: "圣护壁_线清理", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43187"], userControl: false)]
 		public void 圣护壁_线清理(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 2.0) return;
+			if (parse != 2) return;
 			P2Tether = [0, 0, 0, 0, 0, 0, 0, 0];
 		}
 
 		[ScriptMethod(name: "圣护壁_塔指路", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43068"])]
 		public void 圣护壁_塔指路(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 2.0) return;
+			if (parse != 2) return;
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
 			if (P2Tether[myIndex] == 1) return;
 			var pos = JsonConvert.DeserializeObject<Vector3>(@event["SourcePosition"]);
@@ -623,20 +622,20 @@ namespace KodakkuScript
 		[ScriptMethod(name: "后半阶段_换P", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43213"], userControl: false)]
 		public void 后半阶段_换P(Event @event, ScriptAccessory accessory)
 		{
-			parse = 3.0;
+			parse = 3;
 		}
 
 		[ScriptMethod(name: "魔法阵展开_换P", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43193"], userControl: false)]
 		public void 魔法阵展开_换P(Event @event, ScriptAccessory accessory)
 		{
-			if (parse == 3.0) parse = 3.1;
-			if (parse == 3.6) parse = 3.7;
+			if (parse == 3) parse = 4;
+			if (parse == 9) parse = 10;
 		}
 
 		[ScriptMethod(name: "魔法阵展开_地板收集", eventType: EventTypeEnum.EnvControl, eventCondition: ["Flag:256"], userControl: false)]
 		public void 魔法阵展开_地板收集(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.1 && parse != 3.7) return;
+			if (parse != 4 && parse != 10) return;
 			if (!int.TryParse(@event["Index"], out var index))return;
 			if (index == 6)
 			{
@@ -657,7 +656,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "魔法阵展开_指路", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43198"])]
 		public void 魔法阵展开_指路(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.1 && parse != 3.7) return;
+			if (parse != 4 && parse != 10) return;
 			Vector3 NorthStart = new(99.2f, 0, 94.8f);
 			Vector3 NorthEnd = new(90f, 0, 105.5f);
 			Vector3 SouthStart = new(105.6f, 0, 102f);
@@ -713,13 +712,13 @@ namespace KodakkuScript
 		[ScriptMethod(name: "魔法阵展开_二式_换P", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43540"], userControl: false)]
 		public void 魔法阵展开_二式_换P(Event @event, ScriptAccessory accessory)
 		{
-			parse = 3.2;
+			parse = 5;
 		}
 
 		[ScriptMethod(name: "魔法阵展开_二式_地板收集", eventType: EventTypeEnum.EnvControl, eventCondition: ["Flag:256"], userControl: false)]
 		public void 魔法阵展开_二式_地板收集(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.2) return;
+			if (parse != 5) return;
 			if (!int.TryParse(@event["Index"], out var index)) return;
 			if (index == 5)
 			{
@@ -741,7 +740,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "魔法阵展开_二式_指路", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:regex:^(4344[89])$"])]
 		public void 魔法阵展开_二式_指路(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.2) return;
+			if (parse != 5) return;
 
 			//8-先钢铁，9-先月环
 			if (@event.ActionId == 43448)
@@ -891,13 +890,13 @@ namespace KodakkuScript
 		[ScriptMethod(name: "魔法阵展开_三式_换P", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43541"], userControl: false)]
 		public void 魔法阵展开_三式_换P(Event @event, ScriptAccessory accessory)
 		{
-			parse = 3.3;
+			parse = 6;
 		}
 
 		[ScriptMethod(name: "魔法阵展开_三式_地板收集", eventType: EventTypeEnum.EnvControl, eventCondition: ["Flag:256"], userControl: false)]
 		public void 魔法阵展开_三式_地板收集(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.3) return;
+			if (parse != 6) return;
 			if (!int.TryParse(@event["Index"], out var index)) return;
 			if (index < 12)
 			{
@@ -909,7 +908,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "魔法阵展开_三式_地板计算", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43195"], userControl: false)]
 		public void 魔法阵展开_三式_地板计算(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.3) return;
+			if (parse != 6) return;
 			if (P3_3Index[0] * P3_3Index[1] == 0)
 			{
 				return;
@@ -957,7 +956,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "魔法阵展开_三式_点名收集", eventType: EventTypeEnum.TargetIcon, eventCondition: ["Id:0250"], userControl: false)]
 		public void 魔法阵展开_三式_点名收集(Event @event, ScriptAccessory accessory)
 		{			
-			if (parse != 3.3) return;
+			if (parse != 6) return;
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
 			var tIndex = accessory.Data.PartyList.IndexOf(tid);
 			P3_3Mark[tIndex] = 1;
@@ -966,7 +965,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "魔法阵展开_三式_点名指路", eventType: EventTypeEnum.TargetIcon, eventCondition: ["Id:0250"])]
 		public void 魔法阵展开_三式_点名指路(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.3) return;
+			if (parse != 6) return;
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
 			if (P3_3Mark[myIndex] != 1) return;
@@ -1036,9 +1035,10 @@ namespace KodakkuScript
 		}
 
 		[ScriptMethod(name: "魔法阵展开_三式_塔指路", eventType: EventTypeEnum.TargetIcon, eventCondition: ["Id:0250"])]
-		public void 魔法阵展开_三式_塔指路(Event @event, ScriptAccessory accessory)
+		public async void 魔法阵展开_三式_塔指路(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.3) return;
+			if (parse != 6) return;
+			await Task.Delay(1000);
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
 			if (P3_3Mark[myIndex] == 1) return;
 			if (myIndex == 0 || myIndex == 6)
@@ -1103,7 +1103,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "第二轮远近刀_月环记录", eventType: EventTypeEnum.TargetIcon, eventCondition: ["Id:0244"], userControl: false)]
 		public void 第二轮远近刀_月环记录(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.3) return;
+			if (parse != 6) return;
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
 			var tIndex = accessory.Data.PartyList.IndexOf(((uint)tid));
 			P3Circle[tIndex] = 1;
@@ -1116,7 +1116,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "第二轮远近刀_远近记录", eventType: EventTypeEnum.StatusAdd, eventCondition: ["StatusID:2970"], userControl: false)]
 		public void 第二轮远近刀_远近记录(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.3) return;
+			if (parse != 6) return;
 			远近刀记录.Add(@event.StatusParam == 759);
 			if (EnableDev)
 			{
@@ -1128,7 +1128,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "第二轮远近刀_指路", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43181"])]
 		public async void 第二轮远近刀_指路(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.3) return;
+			if (parse != 6) return;
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
 			//13-3-3-3
 			//从正西开始顺时针1-8
@@ -1526,14 +1526,14 @@ namespace KodakkuScript
 		[ScriptMethod(name: "魔法阵展开_四式_换P", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43542"], userControl: false)]
 		public void 魔法阵展开_四式_换P(Event @event, ScriptAccessory accessory)
 		{
-			parse = 3.4;
+			parse = 7;
 			远近刀记录 = [];
 		}
 
 		[ScriptMethod(name: "魔法阵展开_四式_地板收集", eventType: EventTypeEnum.EnvControl, eventCondition: ["Flag:256"], userControl: false)]
 		public void 魔法阵展开_四式_地板收集(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.4) return;
+			if (parse != 7) return;
 			if (!int.TryParse(@event["Index"], out var index)) return;
 			if (index == 6)
 			{
@@ -1559,7 +1559,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "魔法阵展开_四式_点名收集", eventType: EventTypeEnum.TargetIcon, eventCondition: ["Id:0250"], userControl: false)]
 		public void 魔法阵展开_四式_点名收集(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.4) return;
+			if (parse != 7) return;
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
 			var tIndex = accessory.Data.PartyList.IndexOf(tid);
 			P3_4Mark[tIndex] = 1;
@@ -1568,7 +1568,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "魔法阵展开_四式_点名指路", eventType: EventTypeEnum.TargetIcon, eventCondition: ["Id:0250"])]
 		public void 魔法阵展开_四式_点名指路(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.4) return;
+			if (parse != 7) return;
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
 			if (P3_4Mark[myIndex] != 1) return;
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
@@ -1641,7 +1641,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "第三轮远近刀_远近记录", eventType: EventTypeEnum.StatusAdd, eventCondition: ["StatusID:2970"], userControl: false)]
 		public void 第三轮远近刀_远近记录(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.4) return;
+			if (parse != 7) return;
 			远近刀记录.Add(@event.StatusParam == 759);
 			if (EnableDev)
 			{
@@ -1653,7 +1653,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "第三轮远近刀_指路", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43181"])]
 		public async void 第三轮远近刀_指路(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.4) return;
+			if (parse != 7) return;
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
 			//13-3-3-3
 			//从正西开始顺时针1-8
@@ -1956,7 +1956,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "场外分身半场刀", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:regex:^(4318[45])$"])]
 		public void 场外分身半场刀(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.4) return;
+			if (parse != 7) return;
 			if (!ParseObjectId(@event["SourceId"], out var sid)) return;
 			if (EnableDev)
 			{
@@ -1976,13 +1976,13 @@ namespace KodakkuScript
 		[ScriptMethod(name: "魔法阵展开_五式_换P", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43543"], userControl: false)]
 		public void 魔法阵展开_五式_换P(Event @event, ScriptAccessory accessory)
 		{
-			parse = 3.5;
+			parse = 8;
 		}
 
 		[ScriptMethod(name: "魔法阵展开_五式_刀刃收集", eventType: EventTypeEnum.PlayActionTimeline, eventCondition: ["Id:4571"], userControl: false)]
 		public void 魔法阵展开_五式_刀刃收集(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.5) return;
+			if (parse != 8) return;
 			var pos = JsonConvert.DeserializeObject<Vector3>(@event["SourcePosition"]);
 			if (P3_5Safe == 0)
 			{
@@ -2019,7 +2019,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "魔法阵展开_五式_指路", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:regex:^(4344[89])$"])]
 		public void 魔法阵展开_五式_指路(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.5) return;
+			if (parse != 8) return;
 
 			//8-先钢铁，9-先月环
 			if (@event.ActionId == 43448)
@@ -2125,13 +2125,13 @@ namespace KodakkuScript
 		[ScriptMethod(name: "魔法阵展开_六式_换P", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43544"], userControl: false)]
 		public void 魔法阵展开_六式_换P(Event @event, ScriptAccessory accessory)
 		{
-			parse = 3.6;
+			parse = 9;
 		}
 
 		[ScriptMethod(name: "魔法阵展开_六式_地板收集", eventType: EventTypeEnum.EnvControl, eventCondition: ["Flag:256"], userControl: false)]
 		public void 魔法阵展开_六式_地板收集(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.6) return;
+			if (parse != 9) return;
 			if (!int.TryParse(@event["Index"], out var index)) return;
 			if (index == 6)
 			{
@@ -2152,7 +2152,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "魔法阵展开_六式_点名收集", eventType: EventTypeEnum.TargetIcon, eventCondition: ["Id:0250"], userControl: false)]
 		public void 魔法阵展开_六式_点名收集(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.6) return;
+			if (parse != 9) return;
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
 			var tIndex = accessory.Data.PartyList.IndexOf(tid);
 			P3_6Mark[tIndex] = 1;
@@ -2161,7 +2161,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "魔法阵展开_六式_点名指路", eventType: EventTypeEnum.TargetIcon, eventCondition: ["Id:0250"])]
 		public void 魔法阵展开_六式_点名指路(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.6) return;
+			if (parse != 9) return;
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
 			if (tid != accessory.Data.Me) return;
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
@@ -2300,7 +2300,7 @@ namespace KodakkuScript
 		[ScriptMethod(name: "魔法阵展开_六式_塔指路", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43201"])]
 		public void 魔法阵展开_六式_塔指路(Event @event, ScriptAccessory accessory)
 		{
-			if (parse != 3.6) return;
+			if (parse != 9) return;
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
 			if (P3_6Mark[myIndex] == 1) return;
 			if (EnableDev)
