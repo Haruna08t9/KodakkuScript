@@ -18,9 +18,9 @@
     "UpdateInfo": "Game8打法"
   },
   {
-    "Name": "至天の座アルカディア:零式 クルーザー級1",
+    "Name": "至天の座アルカディア零式クルーザー級1",
     "Guid": "783C797E-52BB-41ED-98CD-A2315533036F",
-    "Version": "0.0.0.2",
+    "Version": "0.0.0.3",
     "Author": "UMP",
     "TerritoryIds": [ 1257 ],
     "DownloadUrl": "https://raw.githubusercontent.com/Haruna08t9/KodakkuScript/master/KodakkuScript/M5S.cs",

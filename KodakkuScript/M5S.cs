@@ -24,7 +24,7 @@ using KodakkuAssist.Extensions;
 
 namespace KodakkuScript
 {
-	[ScriptType(name: "至天の座アルカディア:零式 クルーザー級1", territorys: [1257], guid: "783C797E-52BB-41ED-98CD-A2315533036F", version: "0.0.0.2", note: noteStr, author: "UMP")]
+	[ScriptType(name: "至天の座アルカディア零式クルーザー級1", territorys: [1257], guid: "783C797E-52BB-41ED-98CD-A2315533036F", version: "0.0.0.3", note: noteStr, author: "UMP")]
 
 	internal class M5S
 	{
