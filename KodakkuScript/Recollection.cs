@@ -25,7 +25,7 @@ using ECommons.DalamudServices;
 
 namespace KodakkuScript
 {
-	[ScriptType(name: "極ゼレニア討滅戦", territorys: [1271], guid: "6192A434-05E0-4E7E-9724-1CC855E9C975", version: "0.0.0.3", note: noteStr, author: "UMP")]
+	[ScriptType(name: "極ゼレニア討滅戦", territorys: [1271], guid: "6192A434-05E0-4E7E-9724-1CC855E9C975", version: "0.0.0.4", note: noteStr, author: "UMP")]
 
 	public class Recollection
 	{
@@ -514,7 +514,7 @@ namespace KodakkuScript
 			P2Tether[tIndex] = 1;
 		}
 
-		[ScriptMethod(name: "圣护壁_线指路", eventType: EventTypeEnum.Tether, eventCondition: ["Id:0011"])]
+		/*[ScriptMethod(name: "圣护壁_线指路", eventType: EventTypeEnum.Tether, eventCondition: ["Id:0011"])]
 		public void 圣护壁_线指路(Event @event, ScriptAccessory accessory)
 		{
 			if (parse != 2) return;
@@ -573,7 +573,7 @@ namespace KodakkuScript
 				dp.DestoryAt = 5000;
 				accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
 			}
-		}
+		}*/
 
 		[ScriptMethod(name: "圣护壁_线清理", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43187"], userControl: false)]
 		public void 圣护壁_线清理(Event @event, ScriptAccessory accessory)
