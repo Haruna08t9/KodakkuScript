@@ -24,7 +24,7 @@ using KodakkuAssist.Extensions;
 
 namespace KodakkuScript
 {
-	[ScriptType(name: "至天の座アルカディア零式クルーザー級1", territorys: [1257], guid: "783C797E-52BB-41ED-98CD-A2315533036F", version: "0.0.0.3", note: noteStr, author: "UMP")]
+	[ScriptType(name: "至天の座アルカディア零式クルーザー級1", territorys: [1257], guid: "783C797E-52BB-41ED-98CD-A2315533036F", version: "0.0.0.4", note: noteStr, author: "UMP")]
 
 	internal class M5S
 	{
@@ -288,7 +288,7 @@ namespace KodakkuScript
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
 
 			//42844 = 分摊，42846 = 分散
-			if (parse == 2)
+			if (parse == 2 || parse == 3)
 			{
 				int[] group = [4, 5, 6, 7, 0, 1, 2, 3];
 				var myindex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
@@ -303,7 +303,7 @@ namespace KodakkuScript
 				accessory.Method.SendDraw(DrawModeEnum.Default, DrawTypeEnum.Circle, dp);
 			}
 
-			if (parse == 3 || parse == 4)
+			if (parse == 4)
 			{
 				int[] group = [6, 5, 4, 7, 2, 1, 0, 3];
 				var myindex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
@@ -2048,6 +2048,7 @@ namespace KodakkuScript
 				}
 			}
 		}
+
 		#region Utility
 		private static bool ParseObjectId(string? idStr, out uint id)
 		{
