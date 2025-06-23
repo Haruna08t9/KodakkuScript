@@ -14,27 +14,38 @@ using System.ComponentModel;
 using System.Xml.Linq;
 using Dalamud.Utility.Numerics;
 using System.Collections;
-using Dalamud.Game.ClientState.Objects.Types;
+// using Dalamud.Game.ClientState.Objects.Types;
 using ECommons.GameFunctions;
 using Microsoft.VisualBasic.Logging;
 using System.Reflection;
 using KodakkuAssist.Data;
 using KodakkuAssist.Extensions;
-
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 
 namespace KodakkuScript
 {
-	[ScriptType(name: "至天の座アルカディア零式クルーザー級1", territorys: [1257], guid: "783C797E-52BB-41ED-98CD-A2315533036F", version: "0.0.0.4", note: noteStr, author: "UMP")]
+	[ScriptType(name: "至天の座アルカディア零式クルーザー級1", territorys: [1257], guid: "783C797E-52BB-41ED-98CD-A2315533036F", version: "0.0.0.5", note: noteStr, author: "UMP")]
 
 	internal class M5S
 	{
 		const string noteStr =
 	"""
         Game8打法
+        添加了CNServer打法
 
         """;
 		[UserSetting("启用Debug输出")]
 		public bool EnableDev { get; set; }
+		
+		[UserSetting("整体策略")]
+		public static StgEnum GlobalStrat { get; set; } = StgEnum.Game8_Default;
+		
+		public enum StgEnum
+		{
+			Game8_Default,
+			CnServer,
+		}
+		
 		string debugOutput = "";
 		int parse = -1;
 		bool DacneFirst = false;
@@ -50,10 +61,8 @@ namespace KodakkuScript
 		int PairBuffCount = 0;
 		List<int> Dance = [0, 0, 0, 0, 0, 0, 0, 0];
 		List<int> ABPair = [0, 0, 0, 0, 0, 0, 0, 0];
-
-
-
-
+		bool initHint = false;
+		
 		public void Init(ScriptAccessory accessory)
 		{
 			accessory.Method.RemoveDraw(".*");
@@ -72,7 +81,21 @@ namespace KodakkuScript
 			PairBuffCount = 1;
 			Dance = [0, 0, 0, 0, 0, 0, 0, 0];
 			ABPair = [0, 0, 0, 0, 0, 0, 0, 0];
+			initHint = false;
 		}
+		
+		[ScriptMethod(name: "策略与身份提示", eventType: EventTypeEnum.StartCasting,
+			eventCondition: ["ActionId:regex:^(42787)$"], userControl: true)]
+		public void 策略与身份提示(Event ev, ScriptAccessory sa)
+		{
+			if (initHint) return;
+			initHint = true;
+			var myIndex = sa.Data.PartyList.IndexOf(sa.Data.Me); 
+			List<string> role = ["MT", "ST", "H1", "H2", "D1", "D2", "D3", "D4"];
+			sa.Method.TextInfo(
+				$"你是【{role[myIndex]}】，使用策略为【{(GlobalStrat == StgEnum.CnServer ? "国服" : "日野")}】，\n若有误请及时调整。", 4000, true);
+		}
+		
 		[ScriptMethod(name: "钢铁月环_范围显示", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:regex:^(4287[68])$"])]
 		public void 钢铁月环_范围显示(Event @event, ScriptAccessory accessory)
 		{
@@ -419,6 +442,7 @@ namespace KodakkuScript
 					dp.Delay = DacneFirst ? 18000 : 26000;
 					dp.DestoryAt = 4000;
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
+					accessory.Method.TextInfo($"即将，左下近灯", 5000);
 				}
 				if (LightPos == 2)
 				{
@@ -432,6 +456,7 @@ namespace KodakkuScript
 					dp.Delay = DacneFirst ? 18000 : 26000;
 					dp.DestoryAt = 4000;
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
+					accessory.Method.TextInfo($"即将，左上近灯", 5000);
 				}
 			}
 			if (myindex == 1 || myindex == 5)
@@ -448,6 +473,7 @@ namespace KodakkuScript
 					dp.Delay = DacneFirst ? 18000 : 26000;
 					dp.DestoryAt = 4000;
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
+					accessory.Method.TextInfo($"即将，右上近灯", 5000);
 				}
 				if (LightPos == 2)
 				{
@@ -461,6 +487,7 @@ namespace KodakkuScript
 					dp.Delay = DacneFirst ? 18000 : 26000;
 					dp.DestoryAt = 4000;
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
+					accessory.Method.TextInfo($"即将，右下近灯", 5000);
 				}
 			}
 			if (myindex == 2 || myindex == 6)
@@ -477,6 +504,7 @@ namespace KodakkuScript
 					dp.Delay = DacneFirst ? 18000 : 26000;
 					dp.DestoryAt = 4000;
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
+					accessory.Method.TextInfo($"即将，左上远灯", 5000);
 				}
 				if (LightPos == 2)
 				{
@@ -490,6 +518,7 @@ namespace KodakkuScript
 					dp.Delay = DacneFirst ? 18000 : 26000;
 					dp.DestoryAt = 4000;
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
+					accessory.Method.TextInfo($"即将，左下远灯", 5000);
 				}
 			}
 			if (myindex == 3 || myindex == 7)
@@ -506,6 +535,7 @@ namespace KodakkuScript
 					dp.Delay = DacneFirst ? 18000 : 26000;
 					dp.DestoryAt = 4000;
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
+					accessory.Method.TextInfo($"即将，右下远灯", 5000);
 				}
 				if (LightPos == 2)
 				{
@@ -519,6 +549,7 @@ namespace KodakkuScript
 					dp.Delay = DacneFirst ? 18000 : 26000;
 					dp.DestoryAt = 4000;
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
+					accessory.Method.TextInfo($"即将，右上远灯", 5000);
 				}
 			}
 		}
@@ -661,6 +692,36 @@ namespace KodakkuScript
 			}
 		}
 
+		[ScriptMethod(name: "跳舞1_站位指路", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:regex:^(42858)$"])]
+		public void 跳舞1_站位指路(Event @event, ScriptAccessory accessory)
+		{
+			if (parse != 2) return;
+			var myObj = accessory.Data.MyObject;
+			if (myObj == null) return;
+			var myStatus = myObj.HasStatus(4462) ? 4462u : 4463u;
+			var myStatusTime = GetStatusRemainingTime(accessory, myObj, myStatus);
+			accessory.Log.Debug($"状态剩余时间为{myStatusTime}");
+			var myPos = 0;
+			if (myStatusTime > 7) myPos++;
+			if (myStatusTime > 12) myPos++;
+			if (myStatusTime > 17) myPos++;
+			if (myStatusTime > 22) myPos++;
+			// idx 0 不可能出现，除非什么buff都没有
+			// 根据Buff长短从上到下
+			List<Vector3> safePos = [new(100, 0, 100), new(100, 0, 92.5f), new(100, 0, 97.5f), new(100, 0, 102.5f), new(100, 0, 107.5f)];
+
+			// 指路
+			var dp = accessory.Data.GetDefaultDrawProperties();
+			dp.Name = "跳舞1_站位指路";
+			dp.Scale = new(2);
+			dp.ScaleMode |= ScaleMode.YByDistance;
+			dp.Owner = accessory.Data.Me;
+			dp.TargetPosition = safePos[myPos];
+			dp.Color = accessory.Data.DefaultSafeColor;
+			dp.DestoryAt = 5000;
+			accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
+		}
+		
 		[ScriptMethod(name: "跳舞1_配对搭档清理", eventType: EventTypeEnum.ActionEffect, eventCondition: ["ActionId:regex:^(42856|(3947[568]))$"])]
 		public void 跳舞1_配对搭档清理(Event @event, ScriptAccessory accessory)
 		{
@@ -773,10 +834,11 @@ namespace KodakkuScript
 			}
 		}
 
-		[ScriptMethod(name: "小青蛙1_指路", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:regex:^(4284[46])$"])]
-		public void 小青蛙1_指路(Event @event, ScriptAccessory accessory)
+		[ScriptMethod(name: "小青蛙1_指路G8", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:regex:^(4284[46])$"])]
+		public void 小青蛙1_指路G8(Event @event, ScriptAccessory accessory)
 		{
 			if (parse != 3) return;
+			if (GlobalStrat != StgEnum.Game8_Default) return;
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
 			int[] group = [6, 5, 4, 7, 2, 1, 0, 3];
 			var myindex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
@@ -932,6 +994,61 @@ namespace KodakkuScript
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
 				}
 			}
+		}
+		
+		[ScriptMethod(name: "小青蛙1_指路CN", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:regex:^(4284[46])$"])]
+		public void 小青蛙1_指路CN(Event @event, ScriptAccessory accessory)
+		{
+			// 龙龙凤凤
+			if (parse != 3) return;
+			if (GlobalStrat != StgEnum.CnServer) return;
+			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
+			int[] group = [6, 5, 4, 7, 2, 1, 0, 3];
+			var myindex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
+			if (myindex != accessory.Data.PartyList.IndexOf(tid) && group[myindex] != accessory.Data.PartyList.IndexOf(tid)) return;
+			//42844 = 分摊，42846 = 分散
+			var isSpread = @event.ActionId == 42846;
+
+			List<Vector3> safePoints = Enumerable.Repeat(new Vector3(0, 0, 0), 16).ToList();
+		
+			safePoints[0] = new Vector3(95.5f, 0, 89.5f);
+			safePoints[1] = FoldPointHorizon(safePoints[0], 100);
+			safePoints[6] = safePoints[0] - new Vector3(0, 0, 8);			// 0
+			safePoints[7] = FoldPointHorizon(safePoints[6], 100);	// 1
+		
+			safePoints[2] = FoldPointVertical(safePoints[6], 100);	// 4
+			safePoints[3] = FoldPointVertical(safePoints[7], 100);	// 5
+			safePoints[4] = FoldPointVertical(safePoints[0], 100);
+			safePoints[5] = FoldPointVertical(safePoints[1], 100);
+
+			safePoints[8] = new Vector3(safePoints[0].Z, safePoints[0].Y, safePoints[0].X);
+			safePoints[9] = FoldPointHorizon(safePoints[8], 100);
+			safePoints[14] = safePoints[8] - new Vector3(8, 0, 0);			// 8
+			safePoints[15] = FoldPointHorizon(safePoints[14], 100);	// 9
+		
+			safePoints[10] = FoldPointVertical(safePoints[14], 100);	// 12
+			safePoints[11] = FoldPointVertical(safePoints[15], 100);	// 13
+			safePoints[12] = FoldPointVertical(safePoints[8], 100);
+			safePoints[13] = FoldPointVertical(safePoints[9], 100);
+
+			List<int> stackPosIdx = [0, 1, 4, 5, 4, 5, 0, 1, 8, 9, 12, 13, 12, 13, 8, 9];
+			var posIdx = myindex + (IsNorthSafeInFrog1 ? 0 : 8);
+			if (!isSpread)
+				posIdx = stackPosIdx[posIdx];
+		
+			accessory.Log.Debug(
+				$"策略为：{(GlobalStrat == StgEnum.CnServer ? "国服" : "G8日野")}，玩家为：{myindex}，安全区在：{(IsNorthSafeInFrog1 ? "上下" : "左右")}");
+
+			var dp = accessory.Data.GetDefaultDrawProperties();
+			dp.Name = "小青蛙1_指路";
+			dp.Scale = new(2);
+			dp.ScaleMode |= ScaleMode.YByDistance;
+			dp.Owner = accessory.Data.Me;
+			dp.TargetPosition = safePoints[posIdx];
+			dp.Color = accessory.Data.DefaultSafeColor;
+			dp.DestoryAt = 5000;
+			accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
+
 		}
 
 		[ScriptMethod(name: "第二次聚光灯_跳舞BUFF记录", eventType: EventTypeEnum.StatusAdd, eventCondition: ["StatusID:4461"], userControl: false)]
@@ -1119,12 +1236,13 @@ namespace KodakkuScript
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
 				}
 			}
-			if (myindex == 1 || myindex == 5)
+			// 右下, G8 ST, CN H2
+			if (myindex == (GlobalStrat == StgEnum.CnServer ? 3: 1) || myindex == 5)
 			{
 				if (LightPos2 == 1 && FrogPos2 == 1)
 				{
 					var dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "第二次聚光灯_指路STD2";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "第二次聚光灯_指路H2D2" : "第二次聚光灯_指路STD2";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1134,7 +1252,7 @@ namespace KodakkuScript
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
 
 					dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "第二次聚光灯_指路STD2";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "第二次聚光灯_指路H2D2" : "第二次聚光灯_指路STD2";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1147,7 +1265,7 @@ namespace KodakkuScript
 				if (LightPos2 == 1 && FrogPos2 == 2)
 				{
 					var dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "第二次聚光灯_指路STD2";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "第二次聚光灯_指路H2D2" : "第二次聚光灯_指路STD2";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1157,7 +1275,7 @@ namespace KodakkuScript
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
 
 					dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "第二次聚光灯_指路STD2";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "第二次聚光灯_指路H2D2" : "第二次聚光灯_指路STD2";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1170,7 +1288,7 @@ namespace KodakkuScript
 				if (LightPos2 == 2 && FrogPos2 == 1)
 				{
 					var dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "第二次聚光灯_指路STD2";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "第二次聚光灯_指路H2D2" : "第二次聚光灯_指路STD2";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1180,7 +1298,7 @@ namespace KodakkuScript
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
 
 					dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "第二次聚光灯_指路STD2";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "第二次聚光灯_指路H2D2" : "第二次聚光灯_指路STD2";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1193,7 +1311,7 @@ namespace KodakkuScript
 				if (LightPos2 == 2 && FrogPos2 == 2)
 				{
 					var dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "第二次聚光灯_指路STD2";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "第二次聚光灯_指路H2D2" : "第二次聚光灯_指路STD2";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1203,7 +1321,7 @@ namespace KodakkuScript
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
 
 					dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "第二次聚光灯_指路STD2";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "第二次聚光灯_指路H2D2" : "第二次聚光灯_指路STD2";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1309,12 +1427,13 @@ namespace KodakkuScript
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
 				}
 			}
-			if (myindex == 3 || myindex == 7)
+			// 右上，G8 H2, CN ST
+			if (myindex == (GlobalStrat == StgEnum.CnServer ? 1 : 3) || myindex == 7)
 			{
 				if (LightPos2 == 1 && FrogPos2 == 1)
 				{
 					var dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "第二次聚光灯_指路H2D4";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "第二次聚光灯_指路STD4" : "第二次聚光灯_指路H2D4";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1324,7 +1443,7 @@ namespace KodakkuScript
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
 
 					dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "第二次聚光灯_指路H2D4";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "第二次聚光灯_指路STD4" : "第二次聚光灯_指路H2D4";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1337,7 +1456,7 @@ namespace KodakkuScript
 				if (LightPos2 == 1 && FrogPos2 == 2)
 				{
 					var dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "第二次聚光灯_指路H2D4";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "第二次聚光灯_指路STD4" : "第二次聚光灯_指路H2D4";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1347,7 +1466,7 @@ namespace KodakkuScript
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
 
 					dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "第二次聚光灯_指路H2D4";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "第二次聚光灯_指路STD4" : "第二次聚光灯_指路H2D4";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1360,7 +1479,7 @@ namespace KodakkuScript
 				if (LightPos2 == 2 && FrogPos2 == 1)
 				{
 					var dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "第二次聚光灯_指路H2D4";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "第二次聚光灯_指路STD4" : "第二次聚光灯_指路H2D4";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1370,7 +1489,7 @@ namespace KodakkuScript
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
 
 					dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "第二次聚光灯_指路H2D4";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "第二次聚光灯_指路STD4" : "第二次聚光灯_指路H2D4";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1383,7 +1502,7 @@ namespace KodakkuScript
 				if (LightPos2 == 2 && FrogPos2 == 2)
 				{
 					var dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "第二次聚光灯_指路H2D4";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "第二次聚光灯_指路STD4" : "第二次聚光灯_指路H2D4";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1393,7 +1512,7 @@ namespace KodakkuScript
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
 
 					dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "第二次聚光灯_指路H2D4";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "第二次聚光灯_指路STD4" : "第二次聚光灯_指路H2D4";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1688,12 +1807,12 @@ namespace KodakkuScript
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
 				}
 			}
-			if (myindex == 1)
+			if (myindex == (GlobalStrat == StgEnum.CnServer ? 3: 1))
 			{
 				if (SituationInFrog2 == 1)
 				{
 					var dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "小青蛙2_指路ST";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "小青蛙2_指路H2" : "小青蛙2_指路ST";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1705,7 +1824,7 @@ namespace KodakkuScript
 				if (SituationInFrog2 == 2)
 				{
 					var dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "小青蛙2_指路ST";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "小青蛙2_指路H2" : "小青蛙2_指路ST";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1717,7 +1836,7 @@ namespace KodakkuScript
 				if (SituationInFrog2 == 3)
 				{
 					var dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "小青蛙2_指路ST";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "小青蛙2_指路H2" : "小青蛙2_指路ST";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1729,7 +1848,7 @@ namespace KodakkuScript
 				if (SituationInFrog2 == 4)
 				{
 					var dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "小青蛙2_指路ST";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "小青蛙2_指路H2" : "小青蛙2_指路ST";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1790,12 +1909,12 @@ namespace KodakkuScript
 					accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
 				}
 			}
-			if (myindex == 3)
+			if (myindex == (GlobalStrat == StgEnum.CnServer ? 1: 3))
 			{
 				if (SituationInFrog2 == 1)
 				{
 					var dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "小青蛙2_指路H2";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "小青蛙2_指路ST" : "小青蛙2_指路H2";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1807,7 +1926,7 @@ namespace KodakkuScript
 				if (SituationInFrog2 == 2)
 				{
 					var dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "小青蛙2_指路H2";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "小青蛙2_指路ST" : "小青蛙2_指路H2";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1819,7 +1938,7 @@ namespace KodakkuScript
 				if (SituationInFrog2 == 3)
 				{
 					var dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "小青蛙2_指路H2";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "小青蛙2_指路ST" : "小青蛙2_指路H2";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -1831,7 +1950,7 @@ namespace KodakkuScript
 				if (SituationInFrog2 == 4)
 				{
 					var dp = accessory.Data.GetDefaultDrawProperties();
-					dp.Name = "小青蛙2_指路H2";
+					dp.Name = GlobalStrat == StgEnum.CnServer ? "小青蛙2_指路ST" : "小青蛙2_指路H2";
 					dp.Scale = new(2);
 					dp.ScaleMode |= ScaleMode.YByDistance;
 					dp.Owner = accessory.Data.Me;
@@ -2075,7 +2194,27 @@ namespace KodakkuScript
 			return new(centre.X + MathF.Sin(rot) * lenth, centre.Y, centre.Z - MathF.Cos(rot) * lenth);
 		}
 
-
+		public static float GetStatusRemainingTime(ScriptAccessory sa, IBattleChara? battleChara, uint statusId)
+		{
+			if (battleChara == null || !battleChara.IsValid()) return 0;
+			unsafe
+			{
+				BattleChara* charaStruct = (BattleChara*)battleChara.Address;
+				var statusIdx = charaStruct->GetStatusManager()->GetStatusIndex(statusId);
+				return charaStruct->GetStatusManager()->GetRemainingTime(statusIdx);
+			}
+		}
+		
+		public static Vector3 FoldPointHorizon(Vector3 point, float centerX)
+		{
+			return point with { X = 2 * centerX - point.X };
+		}
+		
+		public static Vector3 FoldPointVertical(Vector3 point, float centerZ)
+		{
+			return point with { Z = 2 * centerZ - point.Z };
+		}
+		
 		#endregion
 
 	}

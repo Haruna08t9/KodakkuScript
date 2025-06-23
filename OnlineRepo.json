@@ -20,10 +20,10 @@
   {
     "Name": "至天の座アルカディア零式クルーザー級1",
     "Guid": "783C797E-52BB-41ED-98CD-A2315533036F",
-    "Version": "0.0.0.4",
+    "Version": "0.0.0.5",
     "Author": "UMP",
     "TerritoryIds": [ 1257 ],
     "DownloadUrl": "https://raw.githubusercontent.com/Haruna08t9/KodakkuScript/master/KodakkuScript/M5S.cs",
-    "UpdateInfo": "Game8打法"
+    "UpdateInfo": "Game8打法，添加了CNServer打法"
   }
 ]
