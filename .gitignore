@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /.editorconfig
 /KodakkuScript/KodakkuScript.csproj
 /.gitmodules
+/KodakkuScript/packages.lock.json
