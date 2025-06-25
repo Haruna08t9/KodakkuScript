@@ -16,16 +16,25 @@ using Dalamud.Utility.Numerics;
 using System.Collections;
 using Dalamud.Game.ClientState.Objects.Types;
 using ECommons.GameFunctions;
-using Microsoft.VisualBasic.Logging;
+using KodakkuAssist.Module.GameOperate;
 using System.Reflection;
 using KodakkuAssist.Data;
 using KodakkuAssist.Extensions;
 using ECommons.DalamudServices;
-
+using FFXIVClientStructs;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using KodakkuAssist.Module.Draw.Manager;
+using System.Threading;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Linq;
+using Dalamud.Plugin.Services;
+using ECommons.MathHelpers;
 
 namespace KodakkuScript
 {
-	[ScriptType(name: "極ゼレニア討滅戦", territorys: [1271], guid: "6192A434-05E0-4E7E-9724-1CC855E9C975", version: "0.0.0.4", note: noteStr, author: "UMP")]
+	[ScriptType(name: "極ゼレニア討滅戦", territorys: [1271], guid: "6192A434-05E0-4E7E-9724-1CC855E9C975", version: "0.0.0.5", note: noteStr, author: "UMP")]
 
 	public class Recollection
 	{
@@ -514,23 +523,31 @@ namespace KodakkuScript
 			P2Tether[tIndex] = 1;
 		}
 
-		/*[ScriptMethod(name: "圣护壁_线指路", eventType: EventTypeEnum.Tether, eventCondition: ["Id:0011"])]
-		public void 圣护壁_线指路(Event @event, ScriptAccessory accessory)
+		[ScriptMethod(name: "圣护壁_线指路", eventType: EventTypeEnum.Tether, eventCondition: ["Id:0011"])]
+		public async void 圣护壁_线指路(Event @event, ScriptAccessory accessory)
 		{
 			if (parse != 2) return;
 			if (!ParseObjectId(@event["SourceId"], out var sid)) return;
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
-			if (P2Tether[myIndex] != 1) return;
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
 			if (tid != accessory.Data.Me) return;
-			if (EnableDev)
+			else if (EnableDev)
 			{
 				debugOutput = "你被点了";
 				accessory.Method.SendChat($"""/e {debugOutput}""");
 			}
 			var pos = JsonConvert.DeserializeObject<Vector3>(@event["SourcePosition"]);
+
+			await Task.Delay(1500);
+
 			var c = accessory.Data.Objects.SearchById(sid);
 			if (c == null) return;
+			else if (EnableDev)
+			{
+				debugOutput = "已获取到连线来源";
+				accessory.Method.SendChat($"""/e {debugOutput}""");
+			}
+
 			var transformationID = ((KodakkuAssist.Data.IBattleChara)c).GetTransformationID();
 
 			if (EnableDev)
@@ -573,7 +590,7 @@ namespace KodakkuScript
 				dp.DestoryAt = 5000;
 				accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
 			}
-		}*/
+		}
 
 		[ScriptMethod(name: "圣护壁_线清理", eventType: EventTypeEnum.StartCasting, eventCondition: ["ActionId:43187"], userControl: false)]
 		public void 圣护壁_线清理(Event @event, ScriptAccessory accessory)
@@ -1570,7 +1587,6 @@ namespace KodakkuScript
 		{
 			if (parse != 7) return;
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
-			if (P3_4Mark[myIndex] != 1) return;
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
 			if (tid != accessory.Data.Me) return;
 			if (EnableDev)
@@ -2464,8 +2480,20 @@ namespace KodakkuScript
 			var lenth = v2.Length();
 			return new(centre.X + MathF.Sin(rot) * lenth, centre.Y, centre.Z - MathF.Cos(rot) * lenth);
 		}
-
-
+/*
+		private byte? GetTransformationID(uint _id, ScriptAccessory accessory)
+		{
+			var obj = accessory.Data.Objects.SearchById(_id);
+			if (obj != null)
+			{
+				unsafe
+				{
+					FFXIVClientStructs.FFXIV.Client.Game.Character.Character* objStruct = (FFXIVClientStructs.FFXIV.Client.Game.Character.Character*)obj.Address;
+					return objStruct->Timeline.ModelState;
+				}
+			}
+			return null;
+		}*/
 		#endregion
 	}
 }

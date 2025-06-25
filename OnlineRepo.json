@@ -11,7 +11,7 @@
   {
     "Name": "極ゼレニア討滅戦",
     "Guid": "6192A434-05E0-4E7E-9724-1CC855E9C975",
-    "Version": "0.0.0.4",
+    "Version": "0.0.0.5",
     "Author": "UMP",
     "TerritoryIds": [ 1271 ],
     "DownloadUrl": "https://raw.githubusercontent.com/Haruna08t9/KodakkuScript/master/KodakkuScript/Recollection.cs",
