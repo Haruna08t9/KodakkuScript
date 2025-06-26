@@ -34,7 +34,7 @@ using ECommons.MathHelpers;
 
 namespace KodakkuScript
 {
-	[ScriptType(name: "極ゼレニア討滅戦", territorys: [1271], guid: "6192A434-05E0-4E7E-9724-1CC855E9C975", version: "0.0.0.5", note: noteStr, author: "UMP")]
+	[ScriptType(name: "極ゼレニア討滅戦", territorys: [1271], guid: "6192A434-05E0-4E7E-9724-1CC855E9C975", version: "0.0.0.6", note: noteStr, author: "UMP")]
 
 	public class Recollection
 	{
@@ -985,7 +985,7 @@ namespace KodakkuScript
 			if (parse != 6) return;
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
-			if (P3_3Mark[myIndex] != 1) return;
+			//if (P3_3Mark[myIndex] != 1) return;
 			if (tid != accessory.Data.Me) return;
 
 			if (EnableDev)
@@ -1122,9 +1122,9 @@ namespace KodakkuScript
 		{
 			if (parse != 6) return;
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
-			var tIndex = accessory.Data.PartyList.IndexOf(((uint)tid));
-			P3Circle[tIndex] = 1;
-			if (P3Circle[4] == 1 || P3Circle[5] == 1 || P3Circle[6] == 1 || P3Circle[7] == 1)
+			if (tid != accessory.Data.Me) return;
+			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
+			if (myIndex > 3)
 			{
 				THFirst = true;
 			}
@@ -1173,6 +1173,13 @@ namespace KodakkuScript
 			Vector3 WaitN = new Vector3(100, 0, 94.5f);
 			Vector3 WaitS = new Vector3(100, 0, 105.5f);
 			await Task.Delay(1000);
+
+			if (远近刀记录.Count == 0)
+			{
+				debugOutput = "出现错误，请至DC反馈";
+				accessory.Method.SendChat($"""/e {debugOutput}""");
+				return;
+			}
 
 			if (THFirst)
 			{
