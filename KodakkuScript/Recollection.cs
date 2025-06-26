@@ -34,7 +34,7 @@ using ECommons.MathHelpers;
 
 namespace KodakkuScript
 {
-	[ScriptType(name: "極ゼレニア討滅戦", territorys: [1271], guid: "6192A434-05E0-4E7E-9724-1CC855E9C975", version: "0.0.0.7", note: noteStr, author: "UMP")]
+	[ScriptType(name: "極ゼレニア討滅戦", territorys: [1271], guid: "6192A434-05E0-4E7E-9724-1CC855E9C975", version: "0.0.0.8", note: noteStr, author: "UMP")]
 
 	public class Recollection
 	{
@@ -67,8 +67,8 @@ namespace KodakkuScript
 		float P3_3North = float.Pi;
 
 		//近刀 = 0， 远刀 = 1
-		List<bool> 远近刀记录 = [];
-
+		List<bool> 远近刀记录 = [false, false, false, false];
+		int 远近刀计数 = 0;
 		Vector3 CloseBase = new(100f, 0f, 94f);
 		Vector3 FarBase = new(100f, 0f, 91f);
 		Vector3 centre = new(100f, 0f, 100f);
@@ -118,7 +118,8 @@ namespace KodakkuScript
 			Map4 = false;
 			Map6 = false;
 			P3_5Safe = 0;
-			远近刀记录 = [];
+			远近刀记录 = [false, false, false, false];
+			远近刀计数 = 0;
 			P3_3North = float.Pi;
 		}
 
@@ -197,7 +198,11 @@ namespace KodakkuScript
 		public void 第一轮远近刀_远近记录(Event @event, ScriptAccessory accessory)
 		{
 			if (parse != 1) return;
-			远近刀记录.Add(@event.StatusParam == 759);
+			if (@event.StatusParam == 759)
+			{
+				远近刀记录[远近刀计数] = true;
+			}
+			远近刀计数++;
 			if (EnableDev)
 			{
 				debugOutput = @event.StatusParam == 759 ? "远刀" : "近刀";
@@ -518,7 +523,8 @@ namespace KodakkuScript
 		public void 圣护壁阶段_换P(Event @event, ScriptAccessory accessory)
 		{
 			parse = 2;
-			远近刀记录 = [];
+			远近刀记录 = [false, false, false, false];
+			远近刀计数 = 0;
 		}
 
 		[ScriptMethod(name: "圣护壁_线收集", eventType: EventTypeEnum.Tether, eventCondition: ["Id:0011"], userControl: false)]
@@ -556,13 +562,13 @@ namespace KodakkuScript
 
 			var transformationID = ((KodakkuAssist.Data.IBattleChara)c).GetTransformationID();
 
-			if (EnableDev)
+			if (transformationID != 27 && transformationID != 27)
 			{
-				debugOutput = c.Position.ToString();
-				accessory.Method.SendChat($"""/e {debugOutput}""");			
-				debugOutput = transformationID.ToString();
-				accessory.Method.SendChat($"""/e {debugOutput}"""); 
+				debugOutput = "TransformationID读取失败";
+				accessory.Method.SendChat($"""/e {debugOutput}""");
+				return;
 			}
+
 			Vector3 TH_N_Pos = new(pos.X, 0, pos.Z - 3);
 			Vector3 TH_S_Pos = new(pos.X, 0, pos.Z + 3);
 			Vector3 DPS_N_Pos = new(pos.X, 0, pos.Z - 3);
@@ -1128,11 +1134,46 @@ namespace KodakkuScript
 		{
 			if (parse != 6) return;
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
-			if (tid != accessory.Data.Me) return;
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
 			if (myIndex > 3)
 			{
-				THFirst = true;
+				if (tid == accessory.Data.Me)
+				{
+					THFirst = true;
+					if (EnableDev)
+					{
+						debugOutput = "TH先诱导";
+						accessory.Method.SendChat($"""/e {debugOutput}""");
+					}
+				}
+				else
+				{
+					if (EnableDev)
+					{
+						debugOutput = "DPS先诱导";
+						accessory.Method.SendChat($"""/e {debugOutput}""");
+					}
+				}
+			}
+			else
+			{
+				if (tid == accessory.Data.Me)
+				{
+					if (EnableDev)
+					{
+						debugOutput = "DPS先诱导";
+						accessory.Method.SendChat($"""/e {debugOutput}""");
+					}
+				}
+				else
+				{
+					THFirst = true;
+					if (EnableDev)
+					{
+						debugOutput = "TH先诱导";
+						accessory.Method.SendChat($"""/e {debugOutput}""");
+					}
+				}
 			}
 		}
 
@@ -1140,7 +1181,11 @@ namespace KodakkuScript
 		public void 第二轮远近刀_远近记录(Event @event, ScriptAccessory accessory)
 		{
 			if (parse != 6) return;
-			远近刀记录.Add(@event.StatusParam == 759);
+			if (@event.StatusParam == 759)
+			{
+				远近刀记录[远近刀计数] = true;
+			}
+			远近刀计数++;
 			if (EnableDev)
 			{
 				debugOutput = @event.StatusParam == 759 ? "远刀" : "近刀";
@@ -1557,7 +1602,8 @@ namespace KodakkuScript
 		public void 魔法阵展开_四式_换P(Event @event, ScriptAccessory accessory)
 		{
 			parse = 7;
-			远近刀记录 = [];
+			远近刀记录 = [false, false, false, false];
+			远近刀计数 = 0;
 		}
 
 		[ScriptMethod(name: "魔法阵展开_四式_地板收集", eventType: EventTypeEnum.EnvControl, eventCondition: ["Flag:256"], userControl: false)]
@@ -1671,7 +1717,11 @@ namespace KodakkuScript
 		public void 第三轮远近刀_远近记录(Event @event, ScriptAccessory accessory)
 		{
 			if (parse != 7) return;
-			远近刀记录.Add(@event.StatusParam == 759);
+			if (@event.StatusParam == 759)
+			{
+				远近刀记录[远近刀计数] = true;
+			}
+			远近刀计数++;
 			if (EnableDev)
 			{
 				debugOutput = @event.StatusParam == 759 ? "远刀" : "近刀";
