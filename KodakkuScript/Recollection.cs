@@ -34,7 +34,7 @@ using ECommons.MathHelpers;
 
 namespace KodakkuScript
 {
-	[ScriptType(name: "極ゼレニア討滅戦", territorys: [1271], guid: "6192A434-05E0-4E7E-9724-1CC855E9C975", version: "0.0.0.6", note: noteStr, author: "UMP")]
+	[ScriptType(name: "極ゼレニア討滅戦", territorys: [1271], guid: "6192A434-05E0-4E7E-9724-1CC855E9C975", version: "0.0.0.7", note: noteStr, author: "UMP")]
 
 	public class Recollection
 	{
@@ -234,6 +234,12 @@ namespace KodakkuScript
 			FarPos.Add(new Vector3(100 + FarMutli67_5, 0, 100 + FarMutli22_5));
 
 			await Task.Delay(1000);
+			if (远近刀记录.Count == 0)
+			{
+				debugOutput = "出现错误，请至DC反馈";
+				accessory.Method.SendChat($"""/e {debugOutput}""");
+				return;
+			}
 
 
 			if (myIndex < 4)
@@ -1702,6 +1708,12 @@ namespace KodakkuScript
 			FarPos.Add(new Vector3(100 + FarMutli67_5, 0, 100 + FarMutli22_5));
 
 			await Task.Delay(1000);
+			if (远近刀记录.Count == 0)
+			{
+				debugOutput = "出现错误，请至DC反馈";
+				accessory.Method.SendChat($"""/e {debugOutput}""");
+				return;
+			}
 
 
 			if (myIndex < 4)
