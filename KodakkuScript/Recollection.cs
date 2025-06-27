@@ -31,10 +31,11 @@ using System.Threading.Tasks;
 using System.Linq;
 using Dalamud.Plugin.Services;
 using ECommons.MathHelpers;
+using ImGuizmoNET;
 
 namespace KodakkuScript
 {
-	[ScriptType(name: "極ゼレニア討滅戦", territorys: [1271], guid: "6192A434-05E0-4E7E-9724-1CC855E9C975", version: "0.0.0.8", note: noteStr, author: "UMP")]
+	[ScriptType(name: "極ゼレニア討滅戦", territorys: [1271], guid: "6192A434-05E0-4E7E-9724-1CC855E9C975", version: "0.0.0.9", note: noteStr, author: "UMP")]
 
 	public class Recollection
 	{
@@ -535,45 +536,27 @@ namespace KodakkuScript
 			P2Tether[tIndex] = 1;
 		}
 
-		[ScriptMethod(name: "圣护壁_线指路", eventType: EventTypeEnum.Tether, eventCondition: ["Id:0011"])]
-		public async void 圣护壁_线指路(Event @event, ScriptAccessory accessory)
+		[ScriptMethod(name: "圣护壁_线指路", eventType: EventTypeEnum.PlayActionTimeline, eventCondition: ["Id:regex:^(321[67])$"])]
+		public void 圣护壁_线指路(Event @event, ScriptAccessory accessory)
 		{
 			if (parse != 2) return;
-			if (!ParseObjectId(@event["SourceId"], out var sid)) return;
+			if (!ParseObjectId(@event["Id"], out var id)) return;
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
-			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
-			if (tid != accessory.Data.Me) return;
-			else if (EnableDev)
-			{
-				debugOutput = "你被点了";
-				accessory.Method.SendChat($"""/e {debugOutput}""");
-			}
 			var pos = JsonConvert.DeserializeObject<Vector3>(@event["SourcePosition"]);
-
-			await Task.Delay(1500);
-
-			var c = accessory.Data.Objects.SearchById(sid);
-			if (c == null) return;
-			else if (EnableDev)
-			{
-				debugOutput = "已获取到连线来源";
-				accessory.Method.SendChat($"""/e {debugOutput}""");
-			}
-
-			var transformationID = ((KodakkuAssist.Data.IBattleChara)c).GetTransformationID();
-
-			if (transformationID != 27 && transformationID != 27)
-			{
-				debugOutput = "TransformationID读取失败";
-				accessory.Method.SendChat($"""/e {debugOutput}""");
-				return;
-			}
 
 			Vector3 TH_N_Pos = new(pos.X, 0, pos.Z - 3);
 			Vector3 TH_S_Pos = new(pos.X, 0, pos.Z + 3);
 			Vector3 DPS_N_Pos = new(pos.X, 0, pos.Z - 3);
 			Vector3 DPS_S_Pos = new(pos.X, 0, pos.Z + 3);
-			//27-右刀，28-左刀
+			//4561-出现，3216-右刀-12822，3217-左刀-12823
+			if (P2Tether[myIndex] != 1) return;
+
+			if (EnableDev)
+			{
+				debugOutput = id.ToString();
+				accessory.Method.SendChat($"""/e {debugOutput}""");
+			}
+
 			if (myIndex < 4)
 			{
 				//TH组
@@ -583,7 +566,7 @@ namespace KodakkuScript
 				dp.Scale = new(2);
 				dp.ScaleMode |= ScaleMode.YByDistance;
 				dp.Owner = accessory.Data.Me;
-				dp.TargetPosition = transformationID == 27 ? TH_S_Pos : TH_N_Pos;
+				dp.TargetPosition = id == 12822 ? TH_S_Pos : TH_N_Pos;
 				dp.Color = accessory.Data.DefaultSafeColor;
 				dp.DestoryAt = 5000;
 				accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
@@ -597,7 +580,7 @@ namespace KodakkuScript
 				dp.Scale = new(2);
 				dp.ScaleMode |= ScaleMode.YByDistance;
 				dp.Owner = accessory.Data.Me;
-				dp.TargetPosition = transformationID == 27 ? DPS_N_Pos : DPS_S_Pos;
+				dp.TargetPosition = id == 12822 ? DPS_N_Pos : DPS_S_Pos;
 				dp.Color = accessory.Data.DefaultSafeColor;
 				dp.DestoryAt = 5000;
 				accessory.Method.SendDraw(DrawModeEnum.Imgui, DrawTypeEnum.Displacement, dp);
@@ -1134,45 +1117,24 @@ namespace KodakkuScript
 		{
 			if (parse != 6) return;
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
-			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
-			if (myIndex > 3)
+			if (tid == accessory.Data.PartyList[4] ||
+				tid == accessory.Data.PartyList[5] ||
+				tid == accessory.Data.PartyList[6] ||
+				tid == accessory.Data.PartyList[7])
 			{
-				if (tid == accessory.Data.Me)
+				THFirst = true;
+				if (EnableDev)
 				{
-					THFirst = true;
-					if (EnableDev)
-					{
-						debugOutput = "TH先诱导";
-						accessory.Method.SendChat($"""/e {debugOutput}""");
-					}
-				}
-				else
-				{
-					if (EnableDev)
-					{
-						debugOutput = "DPS先诱导";
-						accessory.Method.SendChat($"""/e {debugOutput}""");
-					}
+					debugOutput = "TH先诱导";
+					accessory.Method.SendChat($"""/e {debugOutput}""");
 				}
 			}
 			else
 			{
-				if (tid == accessory.Data.Me)
+				if (EnableDev)
 				{
-					if (EnableDev)
-					{
-						debugOutput = "DPS先诱导";
-						accessory.Method.SendChat($"""/e {debugOutput}""");
-					}
-				}
-				else
-				{
-					THFirst = true;
-					if (EnableDev)
-					{
-						debugOutput = "TH先诱导";
-						accessory.Method.SendChat($"""/e {debugOutput}""");
-					}
+					debugOutput = "DPS先诱导";
+					accessory.Method.SendChat($"""/e {debugOutput}""");
 				}
 			}
 		}
