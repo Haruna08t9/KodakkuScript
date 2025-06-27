@@ -32,10 +32,12 @@ using System.Linq;
 using Dalamud.Plugin.Services;
 using ECommons.MathHelpers;
 using ImGuizmoNET;
+using static Dalamud.Interface.Utility.Raii.ImRaii;
+using System.Security.Cryptography;
 
 namespace KodakkuScript
 {
-	[ScriptType(name: "極ゼレニア討滅戦", territorys: [1271], guid: "6192A434-05E0-4E7E-9724-1CC855E9C975", version: "0.0.0.9", note: noteStr, author: "UMP")]
+	[ScriptType(name: "極ゼレニア討滅戦", territorys: [1271], guid: "6192A434-05E0-4E7E-9724-1CC855E9C975", version: "0.0.1.0", note: noteStr, author: "UMP")]
 
 	public class Recollection
 	{
@@ -532,12 +534,20 @@ namespace KodakkuScript
 		public void 圣护壁_线收集(Event @event, ScriptAccessory accessory)
 		{
 			if (parse != 2) return;
-			var tIndex = accessory.Data.PartyList.IndexOf((uint)@event.TargetId);
+			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
+			var tIndex = accessory.Data.PartyList.IndexOf(tid);
 			P2Tether[tIndex] = 1;
+			if (EnableDev)
+			{
+				var c = accessory.Data.Objects.SearchById(tid);
+				if (c == null) return;				
+				debugOutput = c.Name.ToString();
+				accessory.Method.SendChat($"""/e {debugOutput}""");
+			}
 		}
 
 		[ScriptMethod(name: "圣护壁_线指路", eventType: EventTypeEnum.PlayActionTimeline, eventCondition: ["Id:regex:^(321[67])$"])]
-		public void 圣护壁_线指路(Event @event, ScriptAccessory accessory)
+		public async void 圣护壁_线指路(Event @event, ScriptAccessory accessory)
 		{
 			if (parse != 2) return;
 			if (!ParseObjectId(@event["Id"], out var id)) return;
@@ -549,7 +559,9 @@ namespace KodakkuScript
 			Vector3 DPS_N_Pos = new(pos.X, 0, pos.Z - 3);
 			Vector3 DPS_S_Pos = new(pos.X, 0, pos.Z + 3);
 			//4561-出现，3216-右刀-12822，3217-左刀-12823
-			if (P2Tether[myIndex] != 1) return;
+			await Task.Delay(1000);
+			
+			if (P2Tether[myIndex] != 1) return;		
 
 			if (EnableDev)
 			{
@@ -1129,8 +1141,12 @@ namespace KodakkuScript
 					accessory.Method.SendChat($"""/e {debugOutput}""");
 				}
 			}
-			else
+			if (tid == accessory.Data.PartyList[0] ||
+				tid == accessory.Data.PartyList[1] ||
+				tid == accessory.Data.PartyList[2] ||
+				tid == accessory.Data.PartyList[3])
 			{
+				THFirst = false;
 				if (EnableDev)
 				{
 					debugOutput = "DPS先诱导";
