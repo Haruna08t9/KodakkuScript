@@ -37,7 +37,7 @@ using System.Security.Cryptography;
 
 namespace KodakkuScript
 {
-	[ScriptType(name: "極ゼレニア討滅戦", territorys: [1271], guid: "6192A434-05E0-4E7E-9724-1CC855E9C975", version: "0.0.1.0", note: noteStr, author: "UMP")]
+	[ScriptType(name: "極ゼレニア討滅戦", territorys: [1271], guid: "6192A434-05E0-4E7E-9724-1CC855E9C975", version: "0.0.1.1", note: noteStr, author: "UMP")]
 
 	public class Recollection
 	{
@@ -2226,9 +2226,9 @@ namespace KodakkuScript
 		{
 			if (parse != 9) return;
 			if (!ParseObjectId(@event["TargetId"], out var tid)) return;
-			if (tid != accessory.Data.Me) return;
 			var myIndex = accessory.Data.PartyList.IndexOf(accessory.Data.Me);
-			if (P3_6Mark[myIndex] != 1) return;
+			//if (P3_6Mark[myIndex] != 1) return;
+			if (tid != accessory.Data.Me) return;
 			if (EnableDev)
 			{
 				debugOutput = "你要放花";
