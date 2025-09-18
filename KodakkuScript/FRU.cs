@@ -19,7 +19,7 @@ using Newtonsoft.Json.Linq;
 
 namespace KodakkuScript;
 
-[ScriptType(name: "絶もうひとつの未来", territorys: [1238], guid: "9AA9B4F9-4B1E-48BB-8FFF-F2CD7C1FEE33", version: "0.0.0.6", note: noteStr, author: "Karlin")]
+[ScriptType(name: "絶もうひとつの未来", territorys: [1238], guid: "9AA9B4F9-4B1E-48BB-8FFF-F2CD7C1FEE33", version: "0.0.0.7", note: noteStr, author: "Karlin")]
 public class EdenUltimate
 {
 	const string noteStr =
