@@ -1,21 +1,23 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using KodakkuAssist.Module.GameEvent;
 using KodakkuAssist.Script;
 using KodakkuAssist.Module.GameEvent.Struct;
 using KodakkuAssist.Module.Draw;
-using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ECommons;
 using System.Numerics;
 using Newtonsoft.Json;
 using System.Linq;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Linq;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Utility.Numerics;
+using KodakkuAssist.Module.GameOperate;
+using Newtonsoft.Json.Linq;
 
 namespace KodakkuScript;
-
 
 [ScriptType(name: "絶もうひとつの未来", territorys: [1238], guid: "9AA9B4F9-4B1E-48BB-8FFF-F2CD7C1FEE33", version: "0.0.0.6", note: noteStr, author: "Karlin")]
 public class EdenUltimate
@@ -44,7 +46,7 @@ public class EdenUltimate
 	double parse = 0;
 
 	int P1雾龙计数 = 0;
-	int[] P1雾龙记录 = [0, 0, 0, 0];
+	List<int> P1雾龙记录 = new List<int> { 0, 0, 0, 0 }; 
 	bool P1雾龙雷 = false;
 
 	bool P1转轮召雷 = false;
@@ -93,7 +95,7 @@ public class EdenUltimate
 	{
 		accessory.Method.RemoveDraw(".*");
 		parse = 1d;
-		P1雾龙记录 = [0, 0, 0, 0];
+		P1雾龙记录 = new List<int> { 0, 0, 0, 0 }; 
 		P1雾龙计数 = 0;
 		P1转轮召抓人 = [0, 0, 0, 0, 0, 0, 0, 0];
 		P1四连线 = [];

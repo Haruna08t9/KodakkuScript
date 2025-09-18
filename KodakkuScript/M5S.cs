@@ -1,24 +1,21 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using KodakkuAssist.Module.GameEvent;
 using KodakkuAssist.Script;
 using KodakkuAssist.Module.GameEvent.Struct;
 using KodakkuAssist.Module.Draw;
-using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ECommons;
 using System.Numerics;
 using Newtonsoft.Json;
 using System.Linq;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Linq;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Utility.Numerics;
-using System.Collections;
-// using Dalamud.Game.ClientState.Objects.Types;
-using ECommons.GameFunctions;
-using Microsoft.VisualBasic.Logging;
-using System.Reflection;
-using KodakkuAssist.Data;
+using KodakkuAssist.Module.GameOperate;
+using Newtonsoft.Json.Linq;
 using KodakkuAssist.Extensions;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 
@@ -26,7 +23,7 @@ namespace KodakkuScript
 {
 	[ScriptType(name: "至天の座アルカディア零式クルーザー級1", territorys: [1257], guid: "783C797E-52BB-41ED-98CD-A2315533036F", version: "0.0.0.5", note: noteStr, author: "UMP")]
 
-	internal class M5S
+	public class M5S
 	{
 		const string noteStr =
 	"""
@@ -699,7 +696,7 @@ namespace KodakkuScript
 			var myObj = accessory.Data.MyObject;
 			if (myObj == null) return;
 			var myStatus = myObj.HasStatus(4462) ? 4462u : 4463u;
-			var myStatusTime = GetStatusRemainingTime(accessory, myObj, myStatus);
+			var myStatusTime = GetStatusRemainingTime(accessory, (IBattleChara?)myObj, myStatus);
 			accessory.Log.Debug($"状态剩余时间为{myStatusTime}");
 			var myPos = 0;
 			if (myStatusTime > 7) myPos++;

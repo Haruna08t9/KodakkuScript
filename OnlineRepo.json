@@ -2,7 +2,7 @@
   {
     "Name": "絶もうひとつの未来",
     "Guid": "9AA9B4F9-4B1E-48BB-8FFF-F2CD7C1FEE33",
-    "Version": "0.0.0.6",
+    "Version": "0.0.0.7",
     "Author": "Karlin",
     "TerritoryIds": [ 1238 ],
     "DownloadUrl": "https://raw.githubusercontent.com/Haruna08t9/KodakkuScript/master/KodakkuScript/FRU.cs",
@@ -11,7 +11,7 @@
   {
     "Name": "極ゼレニア討滅戦",
     "Guid": "6192A434-05E0-4E7E-9724-1CC855E9C975",
-    "Version": "0.0.1.1",
+    "Version": "0.0.1.2",
     "Author": "UMP",
     "TerritoryIds": [ 1271 ],
     "DownloadUrl": "https://raw.githubusercontent.com/Haruna08t9/KodakkuScript/master/KodakkuScript/Recollection.cs",
@@ -20,7 +20,7 @@
   {
     "Name": "至天の座アルカディア零式クルーザー級1",
     "Guid": "783C797E-52BB-41ED-98CD-A2315533036F",
-    "Version": "0.0.0.5",
+    "Version": "0.0.0.6",
     "Author": "UMP",
     "TerritoryIds": [ 1257 ],
     "DownloadUrl": "https://raw.githubusercontent.com/Haruna08t9/KodakkuScript/master/KodakkuScript/M5S.cs",

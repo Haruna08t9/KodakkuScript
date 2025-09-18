@@ -1,39 +1,21 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using KodakkuAssist.Module.GameEvent;
 using KodakkuAssist.Script;
 using KodakkuAssist.Module.GameEvent.Struct;
 using KodakkuAssist.Module.Draw;
-using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ECommons;
 using System.Numerics;
 using Newtonsoft.Json;
 using System.Linq;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Linq;
-using Dalamud.Utility.Numerics;
-using System.Collections;
 using Dalamud.Game.ClientState.Objects.Types;
-using ECommons.GameFunctions;
+using Dalamud.Utility.Numerics;
 using KodakkuAssist.Module.GameOperate;
-using System.Reflection;
-using KodakkuAssist.Data;
-using KodakkuAssist.Extensions;
-using ECommons.DalamudServices;
-using FFXIVClientStructs;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using KodakkuAssist.Module.Draw.Manager;
-using System.Threading;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
-using Dalamud.Plugin.Services;
-using ECommons.MathHelpers;
-using ImGuizmoNET;
-using static Dalamud.Interface.Utility.Raii.ImRaii;
-using System.Security.Cryptography;
+using Newtonsoft.Json.Linq;
 
 namespace KodakkuScript
 {
